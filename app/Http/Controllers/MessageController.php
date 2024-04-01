@@ -13,6 +13,11 @@ class MessageController extends Controller
 
 
 
+    public function show(Message $message)
+    {
+        return $message;
+    }
+
     public function create()
     {
         $users = User::where('id', "!=", auth()->id())->get();
@@ -64,8 +69,4 @@ class MessageController extends Controller
     }
 
 
-    public function show($message)
-    {
-        return $message;
-    }
 }

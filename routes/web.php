@@ -25,7 +25,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 
 Route::get('/message/create', [MessageController::class, 'create'])->name("message.create");
+Route::get('/message/{message}', [MessageController::class, 'show'])->name('message.show');
 
 Route::post('/message', [MessageController::class, 'store'])->name("messages.store");
 
-Route::get('/message/{message}', [MessageController::class, 'show'])->name('message.show');

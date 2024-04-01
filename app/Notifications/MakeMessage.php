@@ -6,9 +6,10 @@ use App\Models\Message;
 use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Messages\VonageMessage;
 use Illuminate\Contracts\Queue\ShouldQueue; // Este apartado eh implementarolo nos ayuda a poner el cola los correo eso debemos ir al env quer conect
-
 class MakeMessage extends Notification implements ShouldQueue
 {
     use Queueable;
@@ -28,7 +29,7 @@ class MakeMessage extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'broadcast', 'vonage'];
     }
 
     /**
@@ -61,11 +62,33 @@ class MakeMessage extends Notification implements ShouldQueue
      */
     public function toDataBase(object $notifiable): array
     {
+        $notifiable->increment('notification');
         $sender = User::find($this->message->sender_id);
 
-        return[
+        return
+        [
             'url' => route('message.show', $this->message),
-            'message' => "Haz recibido un nuevo mensaje de: " . $sender->name
+            'message' => $sender->name
         ];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     */
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage([]);
+    }
+
+    /**
+     * Get the Vonage / SMS representation of the notification.
+     */
+
+    public function toVonage(object $notifiable): VonageMessage
+    {
+        return (new VonageMessage)
+                    ->content('Your SMS message content');
     }
 }

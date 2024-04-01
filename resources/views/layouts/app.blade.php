@@ -12,6 +12,8 @@
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
@@ -30,11 +32,12 @@
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
-                        @guest
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ route('message.create') }}">{{ __('Nuevo Mensaje') }}</a>
-                            </li>
-                        @endguest
+                        @auth
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('message.create') }}">{{ __('Nuevo Mensaje') }}</a>
+                        </li>
+                        @endauth
+
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -56,25 +59,8 @@
 
 
                         @else
-                            <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
-                                    Notificaciones
-                                    <span class="badge bg-danger">9</span>
-                                </a>
+                            @livewire('notifications')
 
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    @forelse (auth()->user()->notifications as $notification)
-                                        <a class="dropdown-item">
-                                            {{ $notification->data['message'] }}
-                                        </a>
-                                    @empty
-                                        <a class="dropdown-item">No tienes notificaciones</a>
-                                    @endforelse
-
-
-                                 </a>
-                                </div>
-                            </li>
 
                             <li class="nav-item dropdown">
                                 <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
@@ -103,5 +89,16 @@
             @yield('content')
         </main>
     </div>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            Echo.private('App.Models.User.' + {{Auth::user()->id}})
+                .notification((notification) => {
+                    console.log(notification.type);
+                });
+        });
+
+    </script>
+
 </body>
 </html>
